@@ -20,8 +20,8 @@
 
 class Julius
 {
-    private const int num = 40;
-    private const float thresh = 4.0f;
+    private const int num = 44;
+    private const float thresh = 16.0f;
 
     public double cx = -0.70176;
     public double cy = -0.3842;

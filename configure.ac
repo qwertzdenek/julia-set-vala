@@ -14,3 +14,4 @@ AC_CHECK_LIB([m], [sqrt])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
+
