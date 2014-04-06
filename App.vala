@@ -96,7 +96,7 @@ class App : Gtk.Window
         var toolbar = new Toolbar ();
         toolbar.get_style_context ().add_class (STYLE_CLASS_PRIMARY_TOOLBAR);
 
-        var save_button = new ToolButton (null, "Save image");
+        var save_button = new ToolButton (null, "Uložit obrázek");
         save_button.set_icon_name ("document-save");
         toolbar.add (save_button);
         save_button.clicked.connect (on_save_clicked);
@@ -123,7 +123,7 @@ class App : Gtk.Window
         Gtk.ToolButton theme_button = new Gtk.ToolButton (img_theme, null);
         theme_button.clicked.connect (() =>
         {
-            Gtk.ColorChooserDialog chooser = new Gtk.ColorChooserDialog ("Choose color", this);
+            Gtk.ColorChooserDialog chooser = new Gtk.ColorChooserDialog ("Vyberte barvu", this);
             if (chooser.run () == Gtk.ResponseType.OK)
             {
                 julius.r = (uint8) (chooser.rgba.red * 255);
@@ -136,7 +136,7 @@ class App : Gtk.Window
         toolbar.add (theme_button);
 
         // refresh button
-        Gtk.ToolButton refresh = new Gtk.ToolButton (new Label("Refresh"), null);
+        Gtk.ToolButton refresh = new Gtk.ToolButton (new Label("Obnovit"), null);
         refresh.clicked.connect (() =>
         {
             xmax = DEFAULT_XMAX;
@@ -320,7 +320,7 @@ class App : Gtk.Window
         catch (GLib.Error e)
         {
             Gtk.MessageDialog msg = new Gtk.MessageDialog (this, Gtk.DialogFlags.MODAL,
-                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Can't draw on canvas");
+                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Nelze kreslit na plátno");
             msg.response.connect ((response_id) =>
             {
                 msg.destroy();
@@ -350,7 +350,7 @@ class App : Gtk.Window
         catch (GLib.Error e)
         {
             Gtk.MessageDialog msg = new Gtk.MessageDialog (this, Gtk.DialogFlags.MODAL,
-                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Can't draw on canvas");
+                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Nelze kreslit na plátno");
             msg.response.connect ((response_id) =>
             {
                 msg.destroy();
@@ -388,10 +388,10 @@ class App : Gtk.Window
      */
     private void on_save_clicked ()
     {
-        var file_chooser = new FileChooserDialog ("Save file", this,
+        var file_chooser = new FileChooserDialog ("Uložit soubor", this,
                 FileChooserAction.SAVE,
-                "Cancel", ResponseType.CANCEL,
-                "Save", ResponseType.ACCEPT);
+                "Zrušit", ResponseType.CANCEL,
+                "Uložit", ResponseType.ACCEPT);
 
         if (file_chooser.run () == ResponseType.ACCEPT)
         {
@@ -402,7 +402,7 @@ class App : Gtk.Window
             catch (GLib.Error e)
             {
                 Gtk.MessageDialog msg = new Gtk.MessageDialog (this, Gtk.DialogFlags.MODAL,
-                        Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Can't write to file");
+                        Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Nemohu zapsat do souboru");
                 msg.response.connect ((response_id) =>
                 {
                     msg.destroy();

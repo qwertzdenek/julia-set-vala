@@ -50,32 +50,36 @@ class Julius
 
         int count;
         double x, y;
-        double x2, y2;
-        double fsq = 0.0;
-        double tmp;
+        double zx, zy;
+        double zx2, zy2;
+        double fsq;
 
         unowned uint8 *pixels = pb.get_pixels();
         int rowstride = pb.get_rowstride();
         uint8 *p;
 
+        double dx = (xmax - xmin) / (w - 1);
+        double dy = (ymax - ymin) / (h - 1);
+
+        y = ymin;
         for (int i = 0; i < h; ++i)
         {
-            y = ymin + (ymax - ymin) * i / (h - 1);
+            x = xmin;
             for (int j = 0; j < w; ++j)
             {
-                x = xmin + (xmax - xmin) * j / (w - 1);
-
                 // Julia count
                 count = 0;
                 fsq = 0.0;
+                zx = x;
+                zy = y;
 
                 while (count < num && fsq < thresh)
                 {
-                    x2 = x * x; // optimalisation
-                    y2 = y * y;
-                    x = x2 - y2 + cx;
-                    y = 2 * x * y + cy;
-                    fsq = x2 + y2;
+                    zx2 = zx * zx; // optimalisation
+                    zy2 = zy * zy;
+                    fsq = zx2 + zy2;
+                    zy = 2.0 * zx * zy + cy;
+                    zx = zx2 - zy2 + cx;
                     count++;
                 }
 
@@ -98,7 +102,11 @@ class Julius
                     p[2] = App.lerp_u(k*k, bg, b);
                     p[3] = 255;
                 }
+
+                x += dx;
             }
+
+            y += dy;
         }
     }
 

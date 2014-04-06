@@ -106,8 +106,8 @@ class Presets : Gtk.Dialog
 
         Gtk.TreeView view = new Gtk.TreeView.with_model (list_store);
 
-        view.insert_column_with_attributes (-1, "Image", new CellRendererPixbuf (), "pixbuf", 0);
-        view.insert_column_with_attributes (-1, "Equation", new CellRendererText (), "text", 1);
+        view.insert_column_with_attributes (-1, "Obrázek", new CellRendererPixbuf (), "pixbuf", 0);
+        view.insert_column_with_attributes (-1, "Rovnice", new CellRendererText (), "text", 1);
 
         get_content_area().add (view);
 
