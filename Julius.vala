@@ -20,34 +20,26 @@
 
 class Julius
 {
+    // *** Attributes ***
+
+    /* count of iterations */
     private const int num = 44;
     private const float thresh = 16.0f;
 
+    /* actual complex constant F(z) = z^2 + c */
     public double cx = -0.70176;
     public double cy = -0.3842;
-    
+
+    /* basic color */
     public uint8 r = 220;
     public uint8 g = 230;
     public uint8 b = 240;
 
-    public int julia_count(double x, double y)
-    {
-        int count = 0;
-        double fsq = 0.0;
-        double tmp;
-
-        while (count < num && fsq < thresh)
-        {
-            tmp = x;
-            x = x * x - y * y + cx;
-            y = 2 * tmp * y + cy;
-            fsq = x * x + y * y;
-            count++;
-        }
-
-        return count;
-    }
-
+    /*
+     * Draws Julia set
+     * pb buffer to write to
+     * .. fractal window
+     */
     public void draw_julius(Gdk.Pixbuf pb, double xmin, double xmax, double ymin, double ymax)
     {
         // clean up Pixbuf
@@ -58,6 +50,9 @@ class Julius
 
         int count;
         double x, y;
+        double x2, y2;
+        double fsq = 0.0;
+        double tmp;
 
         unowned uint8 *pixels = pb.get_pixels();
         int rowstride = pb.get_rowstride();
@@ -70,8 +65,21 @@ class Julius
             {
                 x = xmin + (xmax - xmin) * j / (w - 1);
 
-                count = julia_count(x, y);
+                // Julia count
+                count = 0;
+                fsq = 0.0;
 
+                while (count < num && fsq < thresh)
+                {
+                    x2 = x * x; // optimalisation
+                    y2 = y * y;
+                    x = x2 - y2 + cx;
+                    y = 2 * x * y + cy;
+                    fsq = x2 + y2;
+                    count++;
+                }
+
+                // draw pixel
                 p = pixels + i * rowstride + j * 4;
                 if (count == num)
                 {
@@ -82,9 +90,9 @@ class Julius
                 }
                 else
                 {
-					uint8 bg = bg_color(j, i, w, h);
-					double k = (double) count / num;
-					
+                    uint8 bg = bg_color(j, i, w, h);
+                    double k = (double) count / num;
+
                     p[0] = App.lerp_u(1-Math.sqrt(k), bg, r);
                     p[1] = App.lerp_u(1-k, bg, g);
                     p[2] = App.lerp_u(k*k, bg, b);
@@ -93,18 +101,23 @@ class Julius
             }
         }
     }
-    
+
+    /*
+     * Calculate background color depending on coordinates
+     * x, y coordinates
+     * max, min of the canvas (maximum x and y respectively)
+     */
     private uint8 bg_color(int x, int y, int maxx, int maxy)
     {
-		int centerx = maxx / 2;
-		int centery = maxy / 2;
-		int maxd = centerx * centerx + centery * centery;
-		
-		int dx = x - centerx;
-		int dy = y - centery;
-		
-		int dist = (dx * dx + dy* dy)*255;
-		
-		return (uint8) (255 - dist / maxd);
-	}
+        int centerx = maxx / 2;
+        int centery = maxy / 2;
+        int maxd = centerx * centerx + centery * centery;
+
+        int dx = x - centerx;
+        int dy = y - centery;
+
+        int dist = (dx * dx + dy* dy)*255;
+
+        return (uint8) (255 - dist / maxd);
+    }
 }

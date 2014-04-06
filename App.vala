@@ -25,40 +25,50 @@ using Gdk;
 
 class App : Gtk.Window
 {
+    // *** Constants ***
+
+    /* Default animation time */
     private const int DEFAULT_FADE_TIME = 1000;
+
+    /* Fractal window */
     private const double DEFAULT_XMIN = -1.6;
     private const double DEFAULT_XMAX = 1.6;
     private const double DEFAULT_YMIN = -1.2;
     private const double DEFAULT_YMAX = 1.2;
 
+    // *** Attributes ***
+
+    /* click position last occured */
     private float click_x;
     private float click_y;
 
-    // fractal ranges
+    /* fractal ranges */
     private double xmax = DEFAULT_XMAX;
     private double xmin = DEFAULT_XMIN;
     private double ymax = DEFAULT_YMAX;
     private double ymin = DEFAULT_YMIN;
 
-    // indicates img1 on top
+    /* indicates img1 on top */
     private bool top = true;
 
-    // indicates pressed mouse button
+    /* indicates pressed mouse button */
     private bool pressed = false;
 
-    // drawing stage
+    /* drawing area for animation */
     private Clutter.Actor stage;
     private GtkClutter.Texture img1;
     private GtkClutter.Texture img2;
 
-    // select rectangle
+    /* select rectangle */
     private Clutter.Actor r;
 
-    // Image buffer
+    /* Image buffer */
     private Pixbuf pbact;
 
-	// used julius object
-	public Julius julius;
+    /* used julius object */
+    public Julius julius;
+
+    // *** Enums ***
 
     enum Fades
     {
@@ -77,7 +87,7 @@ class App : Gtk.Window
         this.button_release_event.connect (button_release);
         this.motion_notify_event.connect (motion_event);
 
-		julius = new Julius();
+        julius = new Julius();
 
         // create vertical box
         var box = new Gtk.Box (Gtk.Orientation.VERTICAL, 0);
@@ -86,13 +96,12 @@ class App : Gtk.Window
         var toolbar = new Toolbar ();
         toolbar.get_style_context ().add_class (STYLE_CLASS_PRIMARY_TOOLBAR);
 
-        var save_button = new ToolButton (null, "Uložit");
+        var save_button = new ToolButton (null, "Save image");
         save_button.set_icon_name ("document-save");
-        //save_button.is_important = true;
         toolbar.add (save_button);
         save_button.clicked.connect (on_save_clicked);
 
-		// presets
+        // presets button
         Gtk.Image img_presets = new Gtk.Image.from_icon_name ("insert-image", Gtk.IconSize.SMALL_TOOLBAR);
         Gtk.ToolButton presets_button = new Gtk.ToolButton (img_presets, null);
         presets_button.clicked.connect (() =>
@@ -109,31 +118,32 @@ class App : Gtk.Window
         });
         toolbar.add (presets_button);
 
-		// theme
-		Gtk.Image img_theme = new Gtk.Image.from_icon_name ("preferences-desktop-theme", Gtk.IconSize.SMALL_TOOLBAR);
+        // theme button
+        Gtk.Image img_theme = new Gtk.Image.from_icon_name ("preferences-desktop-theme", Gtk.IconSize.SMALL_TOOLBAR);
         Gtk.ToolButton theme_button = new Gtk.ToolButton (img_theme, null);
         theme_button.clicked.connect (() =>
         {
-			Gtk.ColorChooserDialog chooser = new Gtk.ColorChooserDialog ("Zvolte barvu", this);
-			if (chooser.run () == Gtk.ResponseType.OK) {
-				julius.r = (uint8) (chooser.rgba.red * 255);
+            Gtk.ColorChooserDialog chooser = new Gtk.ColorChooserDialog ("Choose color", this);
+            if (chooser.run () == Gtk.ResponseType.OK)
+            {
+                julius.r = (uint8) (chooser.rgba.red * 255);
                 julius.g = (uint8) (chooser.rgba.green * 255);
                 julius.b = (uint8) (chooser.rgba.blue * 255);
                 paint ();
-			}
-			chooser.close ();
+            }
+            chooser.close ();
         });
         toolbar.add (theme_button);
 
-		// refresh
-        Gtk.ToolButton refresh = new Gtk.ToolButton (new Label("Obnovit"), null);
+        // refresh button
+        Gtk.ToolButton refresh = new Gtk.ToolButton (new Label("Refresh"), null);
         refresh.clicked.connect (() =>
         {
             xmax = DEFAULT_XMAX;
             xmin = DEFAULT_XMIN;
             ymax = DEFAULT_YMAX;
             ymin = DEFAULT_YMIN;
-            
+
             paint();
         });
         toolbar.add (refresh);
@@ -164,6 +174,25 @@ class App : Gtk.Window
         stage.add_child (r);
     }
 
+    /*
+     * linear interpolation between two scalars by k
+     */
+    public static double lerp (double k, double a, double b)
+    {
+        return a + k * (b - a);
+    }
+
+    /*
+     * linear interpolation between two scalars by k
+     */
+    public static uint8 lerp_u (double k, uint8 a, uint8 b)
+    {
+        return (uint8) (a + k * (b - a));
+    }
+
+    /*
+     * button press handler
+     */
     private bool button_press (Gdk.EventButton event)
     {
         pressed = true;
@@ -171,31 +200,25 @@ class App : Gtk.Window
         click_x = (float) event.x;
         click_y = (float) event.y;
 
+        // set rectangle initial values
         r.x = click_x;
         r.y = click_y;
         r.width = 1f;
         r.height = 1f;
-        r.set_opacity (255);
+        r.set_opacity (255); // show
 
         return true;
     }
 
-    public static double lerp (double k, double a, double b)
-    {
-        return a + k * (b - a);
-    }
-    
-    public static uint8 lerp_u (double k, uint8 a, uint8 b)
-    {
-        return (uint8) (a + k * (b - a));
-    }
-
+    /*
+     * button release handler
+     */
     private bool button_release (Gdk.EventButton event)
     {
         pressed = false;
         actor_fade (r, Fades.OUT, 300);
 
-        // Compute new min max
+        // Compute new fractal min max values
         int w = pbact.get_width();
         int h = pbact.get_height();
 
@@ -210,12 +233,15 @@ class App : Gtk.Window
 
         double kymax = (double) (r.y + r.height) / h;
         ymax = lerp(kymax, ymin, ymax);
-        
+
         paint();
 
         return true;
     }
 
+    /*
+     * mouse motion handler
+     */
     private bool motion_event (EventMotion event)
     {
         if (!pressed)
@@ -224,6 +250,7 @@ class App : Gtk.Window
         float delta_x  = (float) (event.x - click_x);
         float delta_y = (float) (event.y - click_y);
 
+        // determine quadrant
         if (delta_x > 0f && delta_y > 0f)
         {
             r.x = click_x;
@@ -256,6 +283,9 @@ class App : Gtk.Window
         return true;
     }
 
+    /*
+     * Window size change handler
+     */
     private void on_size_allocate (Allocation a)
     {
         pbact = new Pixbuf (Gdk.Colorspace.RGB, true, 8, (int) a.width, (int) a.height);
@@ -263,11 +293,14 @@ class App : Gtk.Window
         paint_simple ();
     }
 
+    /*
+     * nice paint method..
+     */
     private void paint ()
     {
         julius.draw_julius(pbact, xmin, xmax, ymin, ymax);
 
-		top = !top;
+        top = !top;
 
         try
         {
@@ -287,7 +320,7 @@ class App : Gtk.Window
         catch (GLib.Error e)
         {
             Gtk.MessageDialog msg = new Gtk.MessageDialog (this, Gtk.DialogFlags.MODAL,
-                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Nemůžu kreslit na plátno");
+                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Can't draw on canvas");
             msg.response.connect ((response_id) =>
             {
                 msg.destroy();
@@ -295,7 +328,10 @@ class App : Gtk.Window
             msg.show();
         }
     }
-    
+
+    /*
+     * simple paint method
+     */
     private void paint_simple ()
     {
         julius.draw_julius(pbact, xmin, xmax, ymin, ymax);
@@ -314,7 +350,7 @@ class App : Gtk.Window
         catch (GLib.Error e)
         {
             Gtk.MessageDialog msg = new Gtk.MessageDialog (this, Gtk.DialogFlags.MODAL,
-                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Nemůžu kreslit na plátno");
+                    Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Can't draw on canvas");
             msg.response.connect ((response_id) =>
             {
                 msg.destroy();
@@ -323,6 +359,12 @@ class App : Gtk.Window
         }
     }
 
+    /*
+     * Do fade animation on the actor.
+     * a actor to animate
+     * f direction of the animation
+     * time run time
+     */
     private void actor_fade (Clutter.Actor a, Fades f, int time)
     {
         a.save_easing_state ();
@@ -331,22 +373,25 @@ class App : Gtk.Window
 
         if (f == Fades.IN)
         {
-            a.set_opacity (255);
+            a.set_opacity (255); // show
         }
         else if (f == Fades.OUT)
         {
-            a.set_opacity (0);
+            a.set_opacity (0); // hide
         }
 
         a.restore_easing_state ();
     }
 
+    /*
+     * Save file handler
+     */
     private void on_save_clicked ()
     {
-        var file_chooser = new FileChooserDialog ("Uložit soubor", this,
+        var file_chooser = new FileChooserDialog ("Save file", this,
                 FileChooserAction.SAVE,
-                "Zrušit", ResponseType.CANCEL,
-                "Uložit", ResponseType.ACCEPT);
+                "Cancel", ResponseType.CANCEL,
+                "Save", ResponseType.ACCEPT);
 
         if (file_chooser.run () == ResponseType.ACCEPT)
         {
@@ -357,7 +402,7 @@ class App : Gtk.Window
             catch (GLib.Error e)
             {
                 Gtk.MessageDialog msg = new Gtk.MessageDialog (this, Gtk.DialogFlags.MODAL,
-                        Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Nelze zapsat do souboru");
+                        Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Can't write to file");
                 msg.response.connect ((response_id) =>
                 {
                     msg.destroy();
@@ -367,8 +412,6 @@ class App : Gtk.Window
         }
         file_chooser.destroy ();
     }
-
-
 
     static int main (string[] args)
     {
