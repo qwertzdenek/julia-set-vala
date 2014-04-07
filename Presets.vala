@@ -136,8 +136,8 @@ class Presets : Gtk.Dialog
 
             dirty = false;
             fr_pos = pos;
-            entryx.set_text (fractals[pos].x.to_string ());
-            entryy.set_text (fractals[pos].y.to_string ());
+            //entryx.set_text (fractals[pos].x.to_string ());
+            //entryy.set_text (fractals[pos].y.to_string ());
 
             own_fractal.x = fractals[pos].x;
             own_fractal.y = fractals[pos].y;
