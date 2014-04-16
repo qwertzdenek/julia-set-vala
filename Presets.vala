@@ -40,6 +40,9 @@ class Presets : Gtk.Dialog
     /* loaded presets from the file */
     private Fractal[] fractals;
 
+	private Gtk.Entry entryx;
+	private Gtk.Entry entryy;
+
     /* choosen preset */
     private int fr_pos = 0;
 
@@ -76,8 +79,7 @@ class Presets : Gtk.Dialog
         try
         {
             dis = new DataInputStream (file.read ());
-            string line;
-            line = dis.read_line (null);
+            string line = dis.read_line (null);
 
             fractals = new Fractal[int.parse(line)];
 
@@ -106,20 +108,27 @@ class Presets : Gtk.Dialog
 
         Gtk.TreeView view = new Gtk.TreeView.with_model (list_store);
 
+        Gtk.ScrolledWindow scrolled = new Gtk.ScrolledWindow (null, null);
+        scrolled.set_min_content_height (480);
+        scrolled.set_min_content_width (700);
+		    scrolled.add (view);
+		    get_content_area().add (scrolled);
+
         view.insert_column_with_attributes (-1, "Obrázek", new CellRendererPixbuf (), "pixbuf", 0);
         view.insert_column_with_attributes (-1, "Rovnice", new CellRendererText (), "text", 1);
 
-        get_content_area().add (view);
-
-        Gtk.Entry entryx = new Gtk.Entry ();
+        entryx = new Gtk.Entry ();
         get_content_area().add (entryx);
 
-        Gtk.Entry entryy = new Gtk.Entry ();
+        entryy = new Gtk.Entry ();
         get_content_area().add (entryy);
 
         TreeIter iter;
         for (int i = 0; i < fractals.length; i++)
         {
+			if (fractals[i].img == null)
+				continue;
+			
             string values = "x=".concat(fractals[i].x.to_string()," y=",fractals[i].y.to_string(),".");
             list_store.append (out iter);
             list_store.set (iter, 0, fractals[i].img, 1, values);
@@ -159,9 +168,7 @@ class Presets : Gtk.Dialog
         });
         entryx.activate.connect (() =>
         {
-            unowned string str = entryx.get_text ();
             dirty = true;
-            own_fractal.x = double.parse(str);
         });
 
         // y value
@@ -178,9 +185,7 @@ class Presets : Gtk.Dialog
         });
         entryy.activate.connect (() =>
         {
-            unowned string str = entryy.get_text ();
             dirty = true;
-            own_fractal.y = double.parse(str);
         });
 
         add_button ("Vybrat", ResponseType.ACCEPT);
@@ -194,6 +199,12 @@ class Presets : Gtk.Dialog
     {
         if (dirty)
         {
+		      	unowned string str = entryx.get_text ();
+            own_fractal.x = double.parse(str);
+            
+            str = entryy.get_text ();
+            own_fractal.y = double.parse(str);
+            
             return own_fractal;
         }
         else

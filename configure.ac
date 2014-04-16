@@ -9,7 +9,8 @@ AC_CONFIG_SRCDIR([App.vala])
 AC_PROG_CC
 
 AM_PROG_VALAC
-PKG_CHECK_MODULES([DEPS], [glib-2.0 gtk+-3.0 clutter-gtk-1.0 gdk-pixbuf-2.0])
+#PKG_CONFIG="pkg-config --static"
+PKG_CHECK_MODULES(DEPS, [glib-2.0 gtk+-3.0 gdk-pixbuf-2.0])
 AC_CHECK_LIB([m], [sqrt])
 
 AC_CONFIG_FILES([Makefile])

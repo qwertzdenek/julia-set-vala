@@ -23,8 +23,9 @@ class Julius
     // *** Attributes ***
 
     /* count of iterations */
-    private const int num = 44;
     private const float thresh = 16.0f;
+
+	  public const int num = 44;
 
     /* actual complex constant F(z) = z^2 + c */
     public double cx = -0.70176;
@@ -40,10 +41,10 @@ class Julius
      * pb buffer to write to
      * .. fractal window
      */
-    public void draw_julius(Gdk.Pixbuf pb, double xmin, double xmax, double ymin, double ymax)
+    public void draw_julius(Gdk.Pixbuf pb, double xmin, double xmax, double ymin, double ymax, int level)
     {
         // clean up Pixbuf
-        pb.fill ((uint32) 0x000000ff);
+        //pb.fill ((uint32) 0x000000ff);
 
         int w = pb.get_width();
         int h = pb.get_height();
@@ -85,47 +86,26 @@ class Julius
 
                 // draw pixel
                 p = pixels + i * rowstride + j * 4;
-                if (count == num)
+                
+                if (count == level)
                 {
-                    p[0] = 0;
-                    p[1] = 0;
-                    p[2] = 0;
-                    p[3] = 255;
-                }
-                else
-                {
-                    uint8 bg = bg_color(j, i, w, h);
-                    double k = (double) count / num;
-
-                    p[0] = App.lerp_u(1-Math.sqrt(k), bg, r);
-                    p[1] = App.lerp_u(1-k, bg, g);
-                    p[2] = App.lerp_u(k*k, bg, b);
-                    p[3] = 255;
-                }
-
+					p[0] = r;
+					p[1] = g;
+					p[2] = b;
+					p[3] = 255;
+				}
+				else
+				{
+					p[0] = 0;
+					p[1] = 0;
+					p[2] = 0;
+					p[3] = 255;
+				}
+                    
                 x += dx;
             }
 
             y += dy;
         }
-    }
-
-    /*
-     * Calculate background color depending on coordinates
-     * x, y coordinates
-     * max, min of the canvas (maximum x and y respectively)
-     */
-    private uint8 bg_color(int x, int y, int maxx, int maxy)
-    {
-        int centerx = maxx / 2;
-        int centery = maxy / 2;
-        int maxd = centerx * centerx + centery * centery;
-
-        int dx = x - centerx;
-        int dy = y - centery;
-
-        int dist = (dx * dx + dy* dy)*255;
-
-        return (uint8) (255 - dist / maxd);
     }
 }

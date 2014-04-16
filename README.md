@@ -1,7 +1,7 @@
 julia-set-vala
 ==============
 
-Julia set visualisation program written in Vala.
+Julia set visualisation program written in Vala and GTK 3.0.
 
 Compile
 -------
