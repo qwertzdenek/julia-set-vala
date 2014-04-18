@@ -92,6 +92,12 @@ class Presets : Gtk.Dialog
                 line = dis.read_line (null);
                 string[] l = line.split (" ", 3);
                 try {
+                    if (l[0] == null)
+                    {
+                        stderr.printf ("Error: Neplatný datový soubor\n");
+                        fractals_count = 0;
+                        break;
+                    }   
                     fractals[i].img = new Gdk.Pixbuf.from_file (l[0]);
                 } catch (Error e) {
                     fractals_count--;
