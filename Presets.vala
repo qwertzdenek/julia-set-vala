@@ -40,8 +40,8 @@ class Presets : Gtk.Dialog
     /* loaded presets from the file */
     private Fractal[] fractals;
 
-	private Gtk.Entry entryx;
-	private Gtk.Entry entryy;
+    private Gtk.Entry entryx;
+    private Gtk.Entry entryy;
 
     /* choosen preset */
     private int fr_pos = 0;
@@ -64,6 +64,7 @@ class Presets : Gtk.Dialog
 
     /*
      * load fractals from the file
+     * f file to read from
      */
     private void load_fractals (string f)
     {
@@ -81,6 +82,7 @@ class Presets : Gtk.Dialog
             dis = new DataInputStream (file.read ());
             string line = dis.read_line (null);
 
+            // count of presets
             fractals = new Fractal[int.parse(line)];
 
             for (int i = 0; i < fractals.length; i++)
@@ -111,8 +113,8 @@ class Presets : Gtk.Dialog
         Gtk.ScrolledWindow scrolled = new Gtk.ScrolledWindow (null, null);
         scrolled.set_min_content_height (360);
         scrolled.set_min_content_width (480);
-		    scrolled.add (view);
-		    get_content_area().add (scrolled);
+        scrolled.add (view);
+        get_content_area().add (scrolled); // add to dialog
 
         view.insert_column_with_attributes (-1, "Obrázek", new CellRendererPixbuf (), "pixbuf", 0);
         view.insert_column_with_attributes (-1, "Rovnice", new CellRendererText (), "text", 1);
@@ -126,8 +128,8 @@ class Presets : Gtk.Dialog
         TreeIter iter;
         for (int i = 0; i < fractals.length; i++)
         {
-			if (fractals[i].img == null)
-				continue;
+            if (fractals[i].img == null)
+                continue;
             string values = "x=%.4f y=%.4f".printf (fractals[i].x, fractals[i].y);
             list_store.append (out iter);
             list_store.set (iter, 0, fractals[i].img, 1, values);
@@ -198,12 +200,12 @@ class Presets : Gtk.Dialog
     {
         if (dirty)
         {
-		      	unowned string str = entryx.get_text ();
+            unowned string str = entryx.get_text ();
             own_fractal.x = double.parse(str);
-            
+
             str = entryy.get_text ();
             own_fractal.y = double.parse(str);
-            
+
             return own_fractal;
         }
         else

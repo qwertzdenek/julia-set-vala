@@ -25,9 +25,9 @@ class Julius
     /* count of iterations */
     private const float thresh = 16.0f;
 
-	  public const int num = 44;
+    public const int num = 44;
 
-    /* actual complex constant F(z) = z^2 + c */
+    /* actual complex constant f(z) = z^2 + c */
     public double cx = -0.70176;
     public double cy = -0.3842;
 
@@ -39,13 +39,10 @@ class Julius
     /*
      * Draws Julia set
      * pb buffer to write to
-     * .. fractal window
+     * .. fractal window and desired level
      */
     public void draw_julius(Gdk.Pixbuf pb, double xmin, double xmax, double ymin, double ymax, int level)
     {
-        // clean up Pixbuf
-        //pb.fill ((uint32) 0x000000ff);
-
         int w = pb.get_width();
         int h = pb.get_height();
 
@@ -71,37 +68,37 @@ class Julius
                 // Julia count
                 count = 0;
                 fsq = 0.0;
-                zx = x;
+                zx = x; // copy current point
                 zy = y;
 
                 while (count < num && fsq < thresh)
                 {
-                    zx2 = zx * zx; // optimalisation
+                    zx2 = zx * zx;
                     zy2 = zy * zy;
                     fsq = zx2 + zy2;
-                    zy = 2.0 * zx * zy + cy;
+                    zy = 2.0 * zx * zy + cy; // move around
                     zx = zx2 - zy2 + cx;
                     count++;
                 }
 
                 // draw pixel
                 p = pixels + i * rowstride + j * 4;
-                
+
                 if (count == level)
                 {
-					p[0] = r;
-					p[1] = g;
-					p[2] = b;
-					p[3] = 255;
-				}
-				else
-				{
-					p[0] = 0;
-					p[1] = 0;
-					p[2] = 0;
-					p[3] = 255;
-				}
-                    
+                    p[0] = r;
+                    p[1] = g;
+                    p[2] = b;
+                    p[3] = 255;
+                }
+                else
+                {
+                    p[0] = 0;
+                    p[1] = 0;
+                    p[2] = 0;
+                    p[3] = 255;
+                }
+
                 x += dx;
             }
 

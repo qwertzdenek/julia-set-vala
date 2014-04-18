@@ -51,7 +51,7 @@ class App : Gtk.Window
 
     /* drawing area for animation */
     private Gtk.Image img;
-    
+
     private Gtk.SpinButton spin;
 
     /* Image buffer */
@@ -67,8 +67,8 @@ class App : Gtk.Window
         IN, OUT
     }
 
-	// *** Methods ***
-	
+    // *** Methods ***
+
     public App ()
     {
         this.title = "Aplikace";
@@ -82,8 +82,8 @@ class App : Gtk.Window
         hb.set_show_close_button (true);
         hb.set_title ("Juliova množina");
         this.set_titlebar (hb);
-        
-        
+
+
         Gtk.Button save_button = new Gtk.Button.from_icon_name ("document-save", Gtk.IconSize.BUTTON);
         save_button.clicked.connect (on_save_clicked);
         hb.pack_start (save_button);
@@ -96,9 +96,9 @@ class App : Gtk.Window
             xmin = DEFAULT_XMIN;
             ymax = DEFAULT_YMAX;
             ymin = DEFAULT_YMIN;
-		        level = MIN_LEVEL;
-		        spin.set_value (MIN_LEVEL);
-			
+            level = MIN_LEVEL;
+            spin.set_value (MIN_LEVEL);
+
             paint();
         });
         hb.pack_start (refresh);
@@ -119,7 +119,7 @@ class App : Gtk.Window
                 ymin = DEFAULT_YMIN;
                 level = MIN_LEVEL;
                 spin.set_value (MIN_LEVEL);
-                
+
                 paint ();
             }
             presets.destroy ();
@@ -141,21 +141,23 @@ class App : Gtk.Window
             chooser.close ();
         });
         hb.pack_end (theme_button);
-        
+
+        // level selection widget
         spin = new Gtk.SpinButton.with_range (MIN_LEVEL, Julius.num, 1);
-        spin.value_changed.connect (() => {
-		    	int val = spin.get_value_as_int ();
-			    level = val;
-			    
-			    paint ();
-		    });
+        spin.value_changed.connect (() =>
+        {
+            int val = spin.get_value_as_int ();
+            level = val;
+
+            paint ();
+        });
         hb.pack_start (spin);
-        
+
         img = new Gtk.Image ();
-        
+
         Gtk.EventBox eb = new EventBox ();
         eb.add (img);
-        
+
         eb.set_events (Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK);
         eb.size_allocate.connect (on_size_allocate);
         eb.button_press_event.connect (button_press);
@@ -163,62 +165,64 @@ class App : Gtk.Window
 
         this.add (eb);
     }
-    
+
     /*
      * button press handler
+     * event method caller
      */
     private bool button_press (Gdk.EventButton event)
     {
-		  if (event.button == 1) // left button
-	  	{
-	  		start_x = event.x;
-	  		start_y = event.y;
-	   	}
-	  	else if (event.button == 3) // right button
-		  {
-		  	level = int.min (++level, Julius.num);
-		  	spin.set_value (level);
-		  	
-		  	paint();
-		  }
+        if (event.button == 1) // left button
+        {
+            start_x = event.x;
+            start_y = event.y;
+        }
+        else if (event.button == 3) // right button
+        {
+            level = int.min (++level, Julius.num);
+            spin.set_value (level);
 
-      return true;
+            paint();
+        }
+
+        return true;
     }
 
     /*
      * button release handler
+     * event method caller
      */
     private bool button_release (Gdk.EventButton event)
     {
-    if (event.button == 1) // left button
-	  	{
-	  		// Compute new fractal min max values
-        int w = pbact.get_width();
-        int h = pbact.get_height();
-        
-        double end_x = event.x;
-        double end_y = event.y;
-        
-        double kxmin = double.min(start_x, end_x) / w;
-        double nxmin = lerp(kxmin, xmin, xmax);
+        if (event.button == 1) // left button
+        {
+            // Compute new fractal min max values
+            int w = pbact.get_width();
+            int h = pbact.get_height();
 
-        double kxmax = double.max(start_x, end_x) / w;
-        double nxmax = lerp(kxmax, xmin, xmax);
+            double end_x = event.x;
+            double end_y = event.y;
 
-        double kymin = double.min(start_y, end_y) / h;
-        double nymin = lerp(kymin, ymin, ymax);
+            double kxmin = double.min(start_x, end_x) / w;
+            double nxmin = lerp(kxmin, xmin, xmax);
 
-        double kymax = double.max(start_y, end_y) / h;
-        double nymax = lerp(kymax, ymin, ymax);
-        
-        xmin = nxmin;
-        xmax = nxmax;
-        ymin = nymin;
-        ymax = nymax;
+            double kxmax = double.max(start_x, end_x) / w;
+            double nxmax = lerp(kxmax, xmin, xmax);
 
-        paint();
-	   	}
-        
+            double kymin = double.min(start_y, end_y) / h;
+            double nymin = lerp(kymin, ymin, ymax);
+
+            double kymax = double.max(start_y, end_y) / h;
+            double nymax = lerp(kymax, ymin, ymax);
+
+            xmin = nxmin;
+            xmax = nxmax;
+            ymin = nymin;
+            ymax = nymax;
+
+            paint();
+        }
+
         return true;
     }
 
@@ -229,7 +233,7 @@ class App : Gtk.Window
     private void on_size_allocate (Allocation a)
     {
         pbact = new Gdk.Pixbuf (Gdk.Colorspace.RGB, true, 8, (int) a.width, (int) a.height);
-        
+
         paint ();
     }
 
@@ -242,13 +246,13 @@ class App : Gtk.Window
     }
 
     /*
-     * nice paint method..
+     * paint method
      */
     private void paint ()
     {
         julius.draw_julius(pbact, xmin, xmax, ymin, ymax, level);
-        
-		    img.set_from_pixbuf (pbact);
+
+        img.set_from_pixbuf (pbact);
     }
 
     /*
