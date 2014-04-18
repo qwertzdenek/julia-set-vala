@@ -109,8 +109,8 @@ class Presets : Gtk.Dialog
         Gtk.TreeView view = new Gtk.TreeView.with_model (list_store);
 
         Gtk.ScrolledWindow scrolled = new Gtk.ScrolledWindow (null, null);
-        scrolled.set_min_content_height (480);
-        scrolled.set_min_content_width (700);
+        scrolled.set_min_content_height (360);
+        scrolled.set_min_content_width (480);
 		    scrolled.add (view);
 		    get_content_area().add (scrolled);
 
@@ -128,8 +128,7 @@ class Presets : Gtk.Dialog
         {
 			if (fractals[i].img == null)
 				continue;
-			
-            string values = "x=".concat(fractals[i].x.to_string()," y=",fractals[i].y.to_string(),".");
+            string values = "x=%.4f y=%.4f".printf (fractals[i].x, fractals[i].y);
             list_store.append (out iter);
             list_store.set (iter, 0, fractals[i].img, 1, values);
         }
