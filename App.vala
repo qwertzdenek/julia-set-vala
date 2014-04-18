@@ -71,7 +71,7 @@ class App : Gtk.Window
 
     public App ()
     {
-        this.title = "Aplikace";
+        this.title = "Juliova množina";
         this.window_position = WindowPosition.CENTER;
         this.set_default_size (800, 600);
         this.destroy.connect (Gtk.main_quit);
@@ -83,13 +83,16 @@ class App : Gtk.Window
         hb.set_title ("Juliova množina");
         this.set_titlebar (hb);
 
-
-        Gtk.Button save_button = new Gtk.Button.from_icon_name ("document-save", Gtk.IconSize.BUTTON);
+        Gtk.Image img_save = new Image.from_icon_name ("document-save", Gtk.IconSize.BUTTON);
+        Gtk.Button save_button = new Gtk.Button();
+        save_button.set_image (img_save);
         save_button.clicked.connect (on_save_clicked);
         hb.pack_start (save_button);
 
         // refresh button
-        Gtk.Button refresh = new Gtk.Button.from_icon_name ("view-refresh", Gtk.IconSize.BUTTON);
+        Gtk.Image img_refresh = new Image.from_icon_name ("view-refresh", Gtk.IconSize.BUTTON);
+        Gtk.Button refresh = new Gtk.Button();
+        refresh.set_image (img_refresh);
         refresh.clicked.connect (() =>
         {
             xmax = DEFAULT_XMAX;
@@ -104,7 +107,9 @@ class App : Gtk.Window
         hb.pack_start (refresh);
 
         // presets button
-        Gtk.Button presets_button = new Gtk.Button.from_icon_name ("insert-image", Gtk.IconSize.BUTTON);
+        Gtk.Image img_insert = new Image.from_icon_name ("insert-image", Gtk.IconSize.BUTTON);
+        Gtk.Button presets_button = new Gtk.Button();
+        presets_button.set_image (img_insert);
         presets_button.clicked.connect (() =>
         {
             var presets = new Presets (this);
@@ -127,7 +132,9 @@ class App : Gtk.Window
         hb.pack_end (presets_button);
 
         // theme button
-        Gtk.Button theme_button = new Gtk.Button.from_icon_name ("preferences-desktop-theme", Gtk.IconSize.BUTTON);
+        Gtk.Image img_theme = new Image.from_icon_name ("preferences-desktop-theme", Gtk.IconSize.BUTTON);
+        Gtk.Button theme_button = new Gtk.Button();
+        theme_button.set_image (img_theme);
         theme_button.clicked.connect (() =>
         {
             Gtk.ColorChooserDialog chooser = new Gtk.ColorChooserDialog ("Vyberte barvu", this);
