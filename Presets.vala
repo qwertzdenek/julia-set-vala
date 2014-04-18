@@ -1,7 +1,7 @@
 /*
  * Presets.vala
  *
- * Copyright 2014 Zdeněk Janeček <haswi@lhota4>
+ * Copyright 2014 Zdeněk Janeček <janecekz@students.zcu.cz>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
