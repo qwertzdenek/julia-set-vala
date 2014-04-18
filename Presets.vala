@@ -39,6 +39,7 @@ class Presets : Gtk.Dialog
 
     /* loaded presets from the file */
     private Fractal[] fractals;
+    private int fractals_count = 0;
 
     private Gtk.Entry entryx;
     private Gtk.Entry entryy;
@@ -84,12 +85,20 @@ class Presets : Gtk.Dialog
 
             // count of presets
             fractals = new Fractal[int.parse(line)];
+            fractals_count = fractals.length;
 
-            for (int i = 0; i < fractals.length; i++)
+            for (int i = 0; i < fractals_count; i++)
             {
                 line = dis.read_line (null);
                 string[] l = line.split (" ", 3);
-                fractals[i].img = new Gdk.Pixbuf.from_file (l[0]);
+                try {
+                    fractals[i].img = new Gdk.Pixbuf.from_file (l[0]);
+                } catch (Error e) {
+                    fractals_count--;
+                    i--;
+                    stderr.printf ("%s\n", e.message);
+                    continue;
+                }
                 fractals[i].x = double.parse(l[1]);
                 fractals[i].y = double.parse(l[2]);
             }
@@ -97,7 +106,7 @@ class Presets : Gtk.Dialog
         }
         catch (Error e)
         {
-            error ("%s", e.message);
+            error ("%s\n", e.message);
         }
     }
 
@@ -126,10 +135,8 @@ class Presets : Gtk.Dialog
         get_content_area().add (entryy);
 
         TreeIter iter;
-        for (int i = 0; i < fractals.length; i++)
+        for (int i = 0; i < fractals_count; i++)
         {
-            if (fractals[i].img == null)
-                continue;
             string values = "x=%.4f y=%.4f".printf (fractals[i].x, fractals[i].y);
             list_store.append (out iter);
             list_store.set (iter, 0, fractals[i].img, 1, values);
