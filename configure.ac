@@ -1,9 +1,10 @@
 AC_PREREQ(2.60)
 AC_INIT([julius], [1.0], [janecekz@students.zcu.cz])
-AM_INIT_AUTOMAKE([-Wall foreign])
+AM_INIT_AUTOMAKE([-Wall subdir-objects foreign])
+AM_SILENT_RULES(yes)
 
 # check for source files
-AC_CONFIG_SRCDIR([App.vala])
+AC_CONFIG_SRCDIR([src/App.vala])
 
 # check for the C compiler
 AC_PROG_CC
